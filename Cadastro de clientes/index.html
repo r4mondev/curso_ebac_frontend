@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agenda de Contatos</title>
+  <!-- Adicionando Font Awesome para os ícones -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* Estilos gerais */
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f0f4f8;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      width: 90%;
+      max-width: 500px;
+    }
+
+    h1, h2 {
+      color: #2c3e50;
+      text-align: center;
+    }
+
+    /* Estilos do formulário de login */
+    #loginContainer {
+      text-align: center;
+    }
+
+    #loginForm input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    #loginForm button {
+      width: 100%;
+      padding: 10px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #loginForm button:hover {
+      background-color: #2980b9;
+    }
+
+    #mensagemErro {
+      color: #e74c3c;
+      display: none;
+      margin-top: 10px;
+    }
+
+    /* Estilos da agenda de contatos */
+    #agendaContainer {
+      display: none;
+    }
+
+    #formContato input {
+      width: calc(100% - 20px);
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    #formContato button {
+      width: 100%;
+      padding: 10px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #formContato button:hover {
+      background-color: #2980b9;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #3498db;
+      color: white;
+    }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      color: #e74c3c;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .delete-btn:hover {
+      color: #c0392b;
+    }
+
+    .whatsapp-btn {
+      background: none;
+      border: none;
+      color: #25d366; /* Cor do WhatsApp */
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .whatsapp-btn:hover {
+      color: #128c7e; /* Cor do WhatsApp (hover) */
+    }
+
+    .share-btn {
+      background: none;
+      border: none;
+      color: #3498db; /* Cor do ícone de compartilhar */
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .share-btn:hover {
+      color: #2980b9; /* Cor do ícone de compartilhar (hover) */
+    }
+
+    #filtro {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      display: none; /* Oculta o campo de filtro inicialmente */
+    }
+
+    .filtro-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .filtro-btn {
+      background: none;
+      border: none;
+      color: #3498db;
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    .filtro-btn:hover {
+      color: #2980b9;
+    }
+
+    .logout-btn {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .logout-btn:hover {
+      background-color: #c0392b;
+    }
+  </style>
+</head>
+<body>
+  <!-- Tela de Login -->
+  <div id="loginContainer" class="container">
+    <h2>Login</h2>
+    <form id="loginForm">
+      <input type="text" id="usuario" placeholder="Usuário" required>
+      <input type="password" id="senha" placeholder="Senha" required>
+      <button type="submit">Entrar</button>
+    </form>
+    <p id="mensagemErro">Usuário ou senha incorretos!</p>
+  </div>
+
+  <!-- Agenda de Contatos (inicialmente oculta) -->
+  <div id="agendaContainer" class="container">
+    <h1>Agenda de Contatos</h1>
+
+    <!-- Botão de Logout -->
+    <button class="logout-btn" onclick="logout()">Logout</button>
+
+    <!-- Container do filtro -->
+    <div class="filtro-container">
+      <button class="filtro-btn" onclick="toggleFiltro()">
+        <i class="fas fa-filter"></i> <!-- Ícone de funil -->
+      </button>
+      <input type="text" id="filtro" placeholder="Filtrar por nome ou DDD">
+    </div>
+
+    <!-- Formulário para adicionar contatos -->
+    <form id="formContato">
+      <input type="text" id="nome" placeholder="Nome" required>
+      <input type="text" id="telefone" placeholder="Telefone (ex: 11987654321)" required>
+      <button type="submit">Cadastrar</button>
+    </form>
+
+    <!-- Tabela de contatos -->
+    <table id="tabelaContatos">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Telefone</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Linhas serão adicionadas dinamicamente aqui -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    // Defina o usuário e senha aqui
+    const USUARIO_CORRETO = "admin";
+    const SENHA_CORRETA = "1234";
+
+    // Elementos da tela de login
+    const loginContainer = document.getElementById("loginContainer");
+    const agendaContainer = document.getElementById("agendaContainer");
+    const mensagemErro = document.getElementById("mensagemErro");
+
+    // Função para validar o login
+    document.getElementById("loginForm").addEventListener("submit", function (event) {
+      event.preventDefault(); // Evita o recarregamento da página
+
+      // Captura os valores dos inputs
+      const usuario = document.getElementById("usuario").value;
+      const senha = document.getElementById("senha").value;
+
+      // Verifica se o usuário e senha estão corretos
+      if (usuario === USUARIO_CORRETO && senha === SENHA_CORRETA) {
+        // Esconde a tela de login e mostra a agenda de contatos
+        loginContainer.style.display = "none";
+        agendaContainer.style.display = "block";
+        mensagemErro.style.display = "none"; // Esconde a mensagem de erro
+      } else {
+        // Exibe a mensagem de erro
+        mensagemErro.style.display = "block";
+      }
+    });
+
+    // Função para formatar o telefone com parênteses no DDD
+    function formatarTelefone(telefone) {
+      // Remove tudo que não for número
+      const numeros = telefone.replace(/\D/g, "");
+
+      // Formata o telefone: (DDD) XXXXX-XXXX
+      if (numeros.length === 11) {
+        return `(${numeros.substring(0, 2)}) ${numeros.substring(2, 7)}-${numeros.substring(7)}`;
+      } else if (numeros.length === 10) {
+        return `(${numeros.substring(0, 2)}) ${numeros.substring(2, 6)}-${numeros.substring(6)}`;
+      } else {
+        return telefone; // Retorna o valor original se não for um telefone válido
+      }
+    }
+
+    // Função para adicionar contato à tabela
+    document.getElementById("formContato").addEventListener("submit", function (event) {
+      event.preventDefault(); // Evita o recarregamento da página
+
+      // Captura os valores dos inputs
+      const nome = document.getElementById("nome").value;
+      const telefone = document.getElementById("telefone").value;
+
+      // Formata o telefone
+      const telefoneFormatado = formatarTelefone(telefone);
+
+      // Cria uma nova linha na tabela
+      const novaLinha = document.createElement("tr");
+      novaLinha.innerHTML = `
+        <td>${nome}</td>
+        <td>${telefoneFormatado}</td>
+        <td>
+          <button class="whatsapp-btn" onclick="abrirWhatsApp('${telefone}')">
+            <i class="fab fa-whatsapp"></i> <!-- Ícone do WhatsApp -->
+          </button>
+          <button class="share-btn" onclick="compartilharContato('${nome}', '${telefoneFormatado}')">
+            <i class="fas fa-share-alt"></i> <!-- Ícone de compartilhar -->
+          </button>
+          <button class="delete-btn" onclick="excluirContato(this)">
+            <i class="fas fa-trash"></i> <!-- Ícone de lixeira -->
+          </button>
+        </td>
+      `;
+
+      // Adiciona a nova linha à tabela
+      document.getElementById("tabelaContatos").querySelector("tbody").appendChild(novaLinha);
+
+      // Limpa os campos do formulário
+      document.getElementById("nome").value = "";
+      document.getElementById("telefone").value = "";
+    });
+
+    // Função para excluir contato
+    function excluirContato(botao) {
+      const linha = botao.closest("tr"); // Encontra a linha (tr) mais próxima
+      linha.remove(); // Remove a linha da tabela
+    }
+
+    // Função para abrir o WhatsApp
+    function abrirWhatsApp(telefone) {
+      // Remove tudo que não for número
+      const numero = telefone.replace(/\D/g, "");
+
+      // Abre o link do WhatsApp
+      window.open(`https://wa.me/${numero}`, "_blank");
+    }
+
+    // Função para compartilhar contato
+    function compartilharContato(nome, telefone) {
+      const texto = `Nome: ${nome}\nTelefone: ${telefone}`;
+
+      // Verifica se a API Web Share é suportada
+      if (navigator.share) {
+        navigator.share({
+          title: "Compartilhar Contato",
+          text: texto,
+        })
+        .catch((error) => console.error("Erro ao compartilhar:", error));
+      } else {
+        // Fallback para copiar o texto
+        navigator.clipboard.writeText(texto)
+          .then(() => alert("Contato copiado para a área de transferência!"))
+          .catch(() => alert("Erro ao copiar o contato."));
+      }
+    }
+
+    // Função para alternar a visibilidade do campo de filtro
+    function toggleFiltro() {
+      const filtro = document.getElementById("filtro");
+      filtro.style.display = filtro.style.display === "none" ? "block" : "none";
+    }
+
+    // Função para filtrar contatos
+    document.getElementById("filtro").addEventListener("input", function () {
+      const filtro = this.value.toLowerCase(); // Valor do campo de filtro
+      const linhas = document.querySelectorAll("#tabelaContatos tbody tr");
+
+      linhas.forEach(function (linha) {
+        const nome = linha.querySelector("td:nth-child(1)").textContent.toLowerCase();
+        const telefone = linha.querySelector("td:nth-child(2)").textContent.toLowerCase();
+
+        // Mostra ou oculta a linha com base no filtro
+        if (nome.includes(filtro) || telefone.includes(filtro)) {
+          linha.style.display = "";
+        } else {
+          linha.style.display = "none";
+        }
+      });
+    });
+
+    // Função para logout
+    function logout() {
+      // Oculta a agenda e mostra a tela de login
+      agendaContainer.style.display = "none";
+      loginContainer.style.display = "block";
+
+      // Limpa os campos de login
+      document.getElementById("usuario").value = "";
+      document.getElementById("senha").value = "";
+    }
+  </script>
+</body>
+</html>
